@@ -48,11 +48,16 @@ namespace ServiceLayer
             if(ConversationRate.ReferenceId.CompareTo(RateReferenceNumber) != 0)
                 throw new ApplicationException($"Conversion rate is no longer available, ConversionRateRequestId=>{Posted.ConversionRateRequestId}");
 
+            
+
             var BuyCurreny =  _currencyService.GetByISO(ConversationRate.BuyCurrency);
             var SellCurreny =  _currencyService.GetByISO(ConversationRate.SellCurrency);
 
             var BuyAccount = await _accountService.GetByHolderAndCurrency(ConversationRate.HolderId, BuyCurreny);
             var SellAccount = await _accountService.GetByHolderAndCurrency(ConversationRate.HolderId, SellCurreny);
+
+            double BuyAccountPreBalance = BuyAccount.Balance;
+            double SellAccountPreBalance = SellAccount.Balance;
 
             _accountService.SellAmount(SellAccount, ConversationRate.SellAmount);
 
@@ -65,7 +70,7 @@ namespace ServiceLayer
                 FxTransactionDetailTypeId = FxTransactionDetailTypeValues.Buy,
                 Amount = ConversationRate.BuyAmount,
                 AccountId = BuyAccount.Id,
-                AccountBalancePre = BuyAccount.Balance - ConversationRate.BuyAmount,
+                AccountBalancePre = BuyAccountPreBalance,
                 AccountBalancePost = BuyAccount.Balance
             };
             var SellFxTransactionDetail = new FxTransactionDetail()
@@ -73,7 +78,7 @@ namespace ServiceLayer
                 FxTransactionDetailTypeId = FxTransactionDetailTypeValues.Sell,
                 Amount = ConversationRate.SellAmount,
                 AccountId = SellAccount.Id,
-                AccountBalancePre = SellAccount.Balance + ConversationRate.SellAmount,
+                AccountBalancePre = SellAccountPreBalance,
                 AccountBalancePost = SellAccount.Balance
             };
 

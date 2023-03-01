@@ -88,7 +88,7 @@ namespace UnitTesting
             {
                 Id = 2,
                 ISOCode = "EUR",
-                Name = "Swiss Franc"
+                Name = "EURO"
             };
             CurrencyList = new();
             CurrencyList.Add(CurrencyUSD);
